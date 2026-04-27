@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Login - KFUEIT Job Fair{% endblock %}
+{% block content %}
+<section class="kf-auth-section">
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="min-height: calc(100vh - 80px);">
+            <div class="col-lg-5 col-md-7">
+
+                <!-- Logo Card -->
+                <div class="text-center mb-4">
+                    <svg viewBox="0 0 100 100" width="90" height="90" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="gAuth" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#1a4a8a"/>
+                                <stop offset="100%" style="stop-color:#0a2342"/>
+                            </linearGradient>
+                        </defs>
+                        <rect width="100" height="100" rx="20" fill="url(#gAuth)"/>
+                        <rect x="10" y="10" width="80" height="80" rx="14" fill="none" stroke="#FFD700" stroke-width="2.5"/>
+                        <text x="50" y="38" text-anchor="middle" font-size="16" font-weight="900" fill="#FFD700" font-family="Arial,sans-serif">KFUEIT</text>
+                        <rect x="15" y="44" width="70" height="2" rx="1" fill="#FFD700" opacity="0.6"/>
+                        <text x="50" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff" font-family="Arial,sans-serif">JOB FAIR</text>
+                        <text x="50" y="80" text-anchor="middle" font-size="10" font-weight="400" fill="#aaccff" font-family="Arial,sans-serif">2026</text>
+                    </svg>
+                    <div class="mt-2 text-white" style="text-shadow: 0 1px 4px rgba(0,0,0,.5);">
+                        <h4 class="fw-bold mb-0">Welcome Back</h4>
+                        <p class="small text-muted">Sign in to your KFUEIT Job Fair account</p>
+                    </div>
+                </div>
+
+                <div class="kf-card">
+                    <div class="kf-card-body p-4">
+
+                        <!-- FIX: form method POST, role selected via JS before submit -->
+                        <form method="POST" action="{{ url_for('login') }}" id="loginForm" novalidate>
+                            <input type="hidden" name="role" id="hiddenRole" value="">
+
+                            <!-- Role Selector -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold text-dark">Login As</label>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <div class="kf-role-btn" id="roleStudent" onclick="setRole('student', this)">
+                                            <i class="fas fa-user-graduate fa-2x mb-2 d-block text-primary"></i>
+                                            <div class="fw-bold">Student</div>
+                                            <small class="text-muted">Browse & apply jobs</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="kf-role-btn" id="roleCompany" onclick="setRole('company', this)">
+                                            <i class="fas fa-building fa-2x mb-2 d-block text-success"></i>
+                                            <div class="fw-bold">Company</div>
+                                            <small class="text-muted">Post & manage jobs</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="roleError" class="text-danger small mt-1 d-none">⚠ Please select Student or Company.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-envelope text-primary"></i></span>
+                                    <input type="email" name="email" class="form-control" placeholder="your@email.com" required autocomplete="email">
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-lock text-primary"></i></span>
+                                    <input type="password" name="password" id="loginPassword" class="form-control" placeholder="Enter your password" required autocomplete="current-password">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('loginPassword', this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold kf-btn-primary" id="loginBtn">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </button>
+                        </form>
+
+                        <hr class="my-4">
+                        <div class="text-center">
+                            <p class="text-muted mb-3">Don't have an account?</p>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <a href="{{ url_for('student_register') }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-user-graduate me-1"></i>Student Register
+                                </a>
+                                <a href="{{ url_for('company_register') }}" class="btn btn-outline-success">
+                                    <i class="fas fa-building me-1"></i>Company Register
+                                </a>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('admin_login') }}" class="text-muted small">
+                                <i class="fas fa-user-shield me-1"></i>Admin Login
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_js %}
+<script>
+// FIX: Role selection - sets hidden field so form always submits properly
+let selectedRole = '';
+
+function setRole(role, el) {
+    selectedRole = role;
+    document.getElementById('hiddenRole').value = role;
+    document.querySelectorAll('.kf-role-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('roleError').classList.add('d-none');
+}
+
+// FIX: Login button - validate role before submit, never silently fail
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    if (!selectedRole) {
+        e.preventDefault();
+        document.getElementById('roleError').classList.remove('d-none');
+        document.getElementById('roleStudent').scrollIntoView({behavior:'smooth'});
+        return false;
+    }
+    const btn = document.getElementById('loginBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
+    btn.disabled = true;
+});
+
+function togglePassword(id, btn) {
+    const inp = document.getElementById(id);
+    if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+    } else {
+        inp.type = 'password';
+        btn.innerHTML = '<i class="fas fa-eye"></i>';
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}

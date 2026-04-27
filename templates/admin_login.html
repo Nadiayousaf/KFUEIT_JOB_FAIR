@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Admin Login - KFUEIT Job Fair{% endblock %}
+{% block content %}
+<section class="kf-auth-section" style="background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 60%, #16213e 100%);">
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="min-height: calc(100vh - 80px);">
+            <div class="col-lg-4 col-md-6">
+
+                <!-- Admin Logo -->
+                <div class="text-center mb-4">
+                    <svg viewBox="0 0 100 100" width="90" height="90" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="gAdmin" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#8b0000"/>
+                                <stop offset="100%" style="stop-color:#c0392b"/>
+                            </linearGradient>
+                        </defs>
+                        <rect width="100" height="100" rx="20" fill="url(#gAdmin)"/>
+                        <rect x="10" y="10" width="80" height="80" rx="14" fill="none" stroke="#FFD700" stroke-width="2.5"/>
+                        <text x="50" y="32" text-anchor="middle" font-size="14" font-weight="900" fill="#FFD700" font-family="Arial,sans-serif">KFUEIT</text>
+                        <rect x="15" y="37" width="70" height="1.5" rx="1" fill="#FFD700" opacity="0.6"/>
+                        <text x="50" y="53" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff" font-family="Arial,sans-serif">ADMIN</text>
+                        <text x="50" y="67" text-anchor="middle" font-size="9" font-weight="600" fill="#ffcccc" font-family="Arial,sans-serif">PANEL</text>
+                        <text x="50" y="83" text-anchor="middle" font-size="8" font-weight="400" fill="#ffaaaa" font-family="Arial,sans-serif">Job Fair 2026</text>
+                    </svg>
+                    <h4 class="fw-bold text-white mt-2 mb-1">Administration Panel</h4>
+                    <p class="text-muted small">Restricted access — authorized personnel only</p>
+                </div>
+
+                <div class="kf-card" style="border-top: 3px solid #dc3545;">
+                    <div class="kf-card-body p-4">
+                        <form method="POST" action="{{ url_for('admin_login') }}" id="adminForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-user text-danger"></i></span>
+                                    <input type="text" name="username" class="form-control" placeholder="admin" required autocomplete="username" value="admin">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-lock text-danger"></i></span>
+                                    <input type="password" name="password" id="adminPass" class="form-control" placeholder="Admin password" required autocomplete="current-password">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('adminPass', this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-danger w-100 btn-lg fw-bold" id="adminBtn">
+                                <i class="fas fa-user-shield me-2"></i>Admin Login
+                            </button>
+                        </form>
+
+                        <div class="text-center mt-4">
+                            <a href="{{ url_for('index') }}" class="text-muted small">
+                                <i class="fas fa-home me-1"></i>Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Credentials hint -->
+                <div class="text-center mt-3 p-2 rounded" style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,215,0,0.3);">
+                    <small class="text-warning">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Default credentials: <strong>admin</strong> / <strong>admin123</strong>
+                    </small>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_js %}
+<script>
+function togglePassword(id, btn) {
+    const inp = document.getElementById(id);
+    if (inp.type === 'password') {
+        inp.type = 'text'; btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+    } else {
+        inp.type = 'password'; btn.innerHTML = '<i class="fas fa-eye"></i>';
+    }
+}
+document.getElementById('adminForm').addEventListener('submit', function() {
+    const btn = document.getElementById('adminBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Authenticating...';
+    btn.disabled = true;
+});
+</script>
+{% endblock %}
+{% endblock %}

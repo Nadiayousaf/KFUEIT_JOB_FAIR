@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard - KFUEIT Job Fair{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="dashboard-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-avatar">{{ student.name[0] }}</div>
+            <div class="sidebar-user-info">
+                <div class="fw-bold text-white">{{ student.name }}</div>
+                <small class="text-muted">{{ student.department or 'KFUEIT Student' }}</small>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('student_dashboard') }}" class="sidebar-link active">
+                <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('jobs') }}" class="sidebar-link">
+                <i class="fas fa-briefcase"></i><span>Browse Jobs</span>
+            </a>
+            <a href="{{ url_for('student_profile') }}" class="sidebar-link">
+                <i class="fas fa-user-edit"></i><span>Edit Profile</span>
+            </a>
+            <hr style="border-color:#334155; margin: 1rem 0;">
+            <a href="{{ url_for('logout') }}" class="sidebar-link text-danger">
+                <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="dashboard-main">
+        <div class="dashboard-topbar">
+            <button class="btn btn-sm btn-outline-secondary d-lg-none me-2" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h4 class="mb-0 fw-bold">Student Dashboard</h4>
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <span class="text-muted small">Welcome, <strong>{{ student.name }}</strong></span>
+                <a href="{{ url_for('student_profile') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-edit me-1"></i>Edit Profile
+                </a>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+
+            <!-- ===== STATS ROW ===== -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3 col-6">
+                    <div class="stat-card stat-blue">
+                        <i class="fas fa-paper-plane stat-icon"></i>
+                        <div class="stat-value">{{ applications|length }}</div>
+                        <div class="stat-label">Applications</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-card stat-green">
+                        <i class="fas fa-check-circle stat-icon"></i>
+                        <div class="stat-value">{{ shortlisted|length }}</div>
+                        <div class="stat-label">Shortlisted</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-card stat-yellow">
+                        <i class="fas fa-bookmark stat-icon"></i>
+                        <div class="stat-value">{{ saved_jobs|length }}</div>
+                        <div class="stat-label">Saved Jobs</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-card stat-red">
+                        <i class="fas fa-star stat-icon"></i>
+                        <div class="stat-value">{{ student.cgpa or 'N/A' }}</div>
+                        <div class="stat-label">CGPA</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+
+                <!-- Profile Card -->
+                <div class="col-lg-4">
+                    <div class="content-card">
+                        <div class="content-card-header">
+                            <h6 class="mb-0"><i class="fas fa-user me-2"></i>My Profile</h6>
+                        </div>
+                        <div class="content-card-body text-center">
+                            <div class="profile-avatar-lg mb-3">{{ student.name[0] }}</div>
+                            <h5 class="fw-bold">{{ student.name }}</h5>
+                            <p class="text-muted mb-1">{{ student.department or 'Department not set' }}</p>
+                            <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+                                {% if student.cgpa %}<span class="badge bg-primary">CGPA: {{ student.cgpa }}</span>{% endif %}
+                            </div>
+                            <div class="profile-info text-start">
+                                <div class="profile-info-row"><i class="fas fa-envelope text-primary me-2"></i>{{ student.email }}</div>
+                                {% if student.phone %}<div class="profile-info-row"><i class="fas fa-phone text-success me-2"></i>{{ student.phone }}</div>{% endif %}
+                                {% if student.skills %}
+                                <div class="mt-2">
+                                    <small class="text-muted fw-bold d-block mb-1">Skills:</small>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% for skill in student.skills.split(',') %}
+                                        <span class="badge bg-light text-dark border">{{ skill.strip() }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% if student.resume %}
+                            <a href="{{ url_for('download_resume', filename=student.resume) }}" class="btn btn-outline-success btn-sm w-100 mt-3">
+                                <i class="fas fa-file-pdf me-1"></i>View Resume
+                            </a>
+                            {% else %}
+                            <a href="{{ url_for('student_profile') }}" class="btn btn-outline-warning btn-sm w-100 mt-3">
+                                <i class="fas fa-upload me-1"></i>Upload Resume
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Applications Tabs -->
+                <div class="col-lg-8">
+                    <div class="content-card">
+                        <div class="content-card-header">
+                            <ul class="nav nav-tabs card-header-tabs" id="dashTabs">
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="#applications" data-bs-toggle="tab">
+                                        <i class="fas fa-list me-1"></i>Applications
+                                        <span class="badge bg-primary ms-1">{{ applications|length }}</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#shortlisted" data-bs-toggle="tab">
+                                        <i class="fas fa-check-circle me-1"></i>Shortlisted
+                                        <span class="badge bg-success ms-1">{{ shortlisted|length }}</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#saved" data-bs-toggle="tab">
+                                        <i class="fas fa-bookmark me-1"></i>Saved
+                                        <span class="badge bg-warning text-dark ms-1">{{ saved_jobs|length }}</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="content-card-body p-0">
+                            <div class="tab-content">
+
+                                <!-- ALL APPLICATIONS TAB -->
+                                <div class="tab-pane fade show active" id="applications">
+                                    {% if applications %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Job Title</th>
+                                                    <th>Company</th>
+                                                    <th>Applied</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for app in applications %}
+                                                <tr>
+                                                    <td class="fw-semibold">{{ app.job.title }}</td>
+                                                    <td>{{ app.job.company.company_name }}</td>
+                                                    <td><small class="text-muted">{{ app.applied_at.strftime('%b %d, %Y') }}</small></td>
+                                                    <td>
+                                                        <span class="badge {% if app.status == 'Shortlisted' %}bg-success{% elif app.status == 'Rejected' %}bg-danger{% elif app.status == 'Hired' %}bg-info{% else %}bg-warning text-dark{% endif %}">
+                                                            {{ app.status }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="empty-state">
+                                        <i class="fas fa-briefcase fa-3x text-muted mb-3 d-block"></i>
+                                        <h6 class="text-muted">No Applications Yet</h6>
+                                        <p class="text-muted small">Start applying for your dream jobs!</p>
+                                        <a href="{{ url_for('jobs') }}" class="btn btn-primary btn-sm">Browse Jobs</a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- SHORTLISTED TAB -->
+                                <div class="tab-pane fade" id="shortlisted">
+                                    {% if shortlisted %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead class="table-success">
+                                                <tr>
+                                                    <th>Job Title</th>
+                                                    <th>Company</th>
+                                                    <th>Location</th>
+                                                    <th>Salary</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for app in shortlisted %}
+                                                <tr>
+                                                    <td class="fw-semibold text-success">{{ app.job.title }}</td>
+                                                    <td>{{ app.job.company.company_name }}</td>
+                                                    <td><small>{{ app.job.location or '—' }}</small></td>
+                                                    <td><small class="text-success">{{ app.job.salary or '—' }}</small></td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="empty-state">
+                                        <i class="fas fa-trophy fa-3x text-muted mb-3 d-block"></i>
+                                        <h6 class="text-muted">No Shortlists Yet</h6>
+                                        <p class="text-muted small">Keep applying — shortlists will appear here when companies select you.</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- SAVED JOBS TAB -->
+                                <div class="tab-pane fade" id="saved">
+                                    {% if saved_jobs %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead class="table-warning">
+                                                <tr>
+                                                    <th>Job Title</th>
+                                                    <th>Company</th>
+                                                    <th>Location</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for saved in saved_jobs %}
+                                                <tr>
+                                                    <td class="fw-semibold">{{ saved.job.title }}</td>
+                                                    <td>{{ saved.job.company.company_name }}</td>
+                                                    <td><small>{{ saved.job.location or '—' }}</small></td>
+                                                    <td>
+                                                        <div class="d-flex gap-1">
+                                                            <a href="{{ url_for('apply_job', job_id=saved.job.id) }}" class="btn btn-xs btn-primary"
+                                                               onclick="return confirm('Apply for this job?')">Apply</a>
+                                                            <a href="{{ url_for('unsave_job', job_id=saved.job.id) }}" class="btn btn-xs btn-outline-danger">Remove</a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="empty-state">
+                                        <i class="fas fa-bookmark fa-3x text-muted mb-3 d-block"></i>
+                                        <h6 class="text-muted">No Saved Jobs</h6>
+                                        <p class="text-muted small">Save jobs you're interested in for later!</p>
+                                        <a href="{{ url_for('jobs') }}" class="btn btn-warning btn-sm text-dark">Browse & Save Jobs</a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Latest Job Openings -->
+                    <div class="content-card mt-4">
+                        <div class="content-card-header d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0"><i class="fas fa-fire me-2 text-danger"></i>Latest Job Openings</h6>
+                            <a href="{{ url_for('jobs') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                        </div>
+                        <div class="content-card-body p-0">
+                            {% for job in recent_jobs %}
+                            <div class="job-list-item">
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">{{ job.title }}</div>
+                                    <small class="text-muted">{{ job.company.company_name }}
+                                        {% if job.location %}&bull; <i class="fas fa-map-marker-alt me-1"></i>{{ job.location }}{% endif %}
+                                    </small>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if job.salary %}<small class="text-success fw-semibold d-none d-md-block">{{ job.salary }}</small>{% endif %}
+                                    <a href="{{ url_for('apply_job', job_id=job.id) }}" class="btn btn-sm btn-primary"
+                                       onclick="return confirm('Apply for {{ job.title }}?')">Apply</a>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="empty-state">
+                                <p class="text-muted">No jobs available right now.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+{% block extra_js %}
+<script>
+document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+    document.getElementById('sidebar').classList.toggle('active');
+});
+</script>
+{% endblock %}
+{% endblock %}

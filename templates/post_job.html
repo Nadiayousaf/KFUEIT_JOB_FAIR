@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Post Job - KFUEIT Job Fair{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-avatar" style="background:#0d6efd;">{{ session.user_name[0] if session.user_name else 'C' }}</div>
+            <div class="sidebar-user-info">
+                <div class="fw-bold text-white small">{{ session.user_name }}</div>
+                <small class="text-muted">Company</small>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('company_dashboard') }}" class="sidebar-link">
+                <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('post_job') }}" class="sidebar-link active">
+                <i class="fas fa-plus-circle"></i><span>Post New Job</span>
+            </a>
+            <hr style="border-color:#334155; margin: 1rem 0;">
+            <a href="{{ url_for('logout') }}" class="sidebar-link text-danger">
+                <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+            </a>
+        </nav>
+    </aside>
+    <main class="dashboard-main">
+        <div class="dashboard-topbar">
+            <h4 class="mb-0 fw-bold">Post New Job</h4>
+        </div>
+        <div class="dashboard-content">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="content-card">
+                        <div class="content-card-header">
+                            <h6 class="mb-0"><i class="fas fa-plus me-2"></i>Create Job Posting</h6>
+                        </div>
+                        <div class="content-card-body">
+                            <form method="POST" action="{{ url_for('post_job') }}" data-gs-type="job_post">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Job Title <span class="text-danger">*</span></label>
+                                        <input type="text" name="title" class="form-control form-control-lg" placeholder="e.g. Senior Software Engineer" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Salary Range</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-money-bill text-success"></i></span>
+                                            <input type="text" name="salary" class="form-control" placeholder="PKR 80,000 - 120,000">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Location</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-map-marker-alt text-danger"></i></span>
+                                            <input type="text" name="location" class="form-control" placeholder="Lahore / Remote">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Application Deadline</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-calendar text-primary"></i></span>
+                                            <input type="date" name="deadline" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Job Description <span class="text-danger">*</span></label>
+                                        <textarea name="description" class="form-control" rows="6"
+                                            placeholder="Describe the role, responsibilities, required qualifications, experience, etc." required></textarea>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-3 mt-4">
+                                    <button type="submit" class="btn btn-primary px-5 fw-bold btn-lg">
+                                        <i class="fas fa-paper-plane me-2"></i>Post Job
+                                    </button>
+                                    <a href="{{ url_for('company_dashboard') }}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Applicants - {{ job.title }}{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-avatar" style="background:#0d6efd;">{{ session.user_name[0] if session.user_name else 'C' }}</div>
+            <div class="sidebar-user-info">
+                <div class="fw-bold text-white small">{{ session.user_name }}</div>
+                <small class="text-muted">Company</small>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('company_dashboard') }}" class="sidebar-link active">
+                <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('post_job') }}" class="sidebar-link">
+                <i class="fas fa-plus-circle"></i><span>Post New Job</span>
+            </a>
+            <hr style="border-color:#334155; margin: 1rem 0;">
+            <a href="{{ url_for('logout') }}" class="sidebar-link text-danger">
+                <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+            </a>
+        </nav>
+    </aside>
+    <main class="dashboard-main">
+        <div class="dashboard-topbar">
+            <a href="{{ url_for('company_dashboard') }}" class="btn btn-sm btn-outline-secondary me-3">
+                <i class="fas fa-arrow-left me-1"></i>Back
+            </a>
+            <h4 class="mb-0 fw-bold">Applicants — {{ job.title }}</h4>
+        </div>
+        <div class="dashboard-content">
+            <div class="content-card">
+                <div class="content-card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="fas fa-users me-2"></i>{{ applications|length }} Applicant{{ 's' if applications|length != 1 }}</h6>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-primary">{{ job.location or 'N/A' }}</span>
+                        {% if job.salary %}<span class="badge bg-success">{{ job.salary }}</span>{% endif %}
+                    </div>
+                </div>
+                <div class="content-card-body p-0">
+                    {% if applications %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Student Name</th>
+                                    <th>Email</th>
+                                    <th>Department</th>
+                                    <th>CGPA</th>
+                                    <th>Skills</th>
+                                    <th>Resume</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in applications %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td class="fw-semibold">{{ app.student.name }}</td>
+                                    <td><small>{{ app.student.email }}</small></td>
+                                    <td><small>{{ app.student.department or 'N/A' }}</small></td>
+                                    <td>
+                                        {% if app.student.cgpa %}
+                                        <span class="badge {% if app.student.cgpa >= 3.5 %}bg-success{% elif app.student.cgpa >= 3.0 %}bg-primary{% else %}bg-warning text-dark{% endif %}">
+                                            {{ app.student.cgpa }}
+                                        </span>
+                                        {% else %}N/A{% endif %}
+                                    </td>
+                                    <td>
+                                        {% if app.student.skills %}
+                                        <small>{{ app.student.skills[:40] }}{% if app.student.skills|length > 40 %}...{% endif %}</small>
+                                        {% else %}<small class="text-muted">Not specified</small>{% endif %}
+                                    </td>
+                                    <td>
+                                        {% if app.student.resume %}
+                                        <a href="{{ url_for('download_resume', filename=app.student.resume) }}" target="_blank" class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-file-pdf me-1"></i>View
+                                        </a>
+                                        {% else %}<small class="text-muted">No resume</small>{% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if app.status == 'Shortlisted' %}bg-success{% elif app.status == 'Rejected' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                            {{ app.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <a href="{{ url_for('shortlist', app_id=app.id, status='Shortlisted') }}" class="btn btn-sm btn-success" title="Shortlist">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                            <a href="{{ url_for('shortlist', app_id=app.id, status='Rejected') }}" class="btn btn-sm btn-danger" title="Reject">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                            <a href="{{ url_for('shortlist', app_id=app.id, status='Pending') }}" class="btn btn-sm btn-secondary" title="Reset">
+                                                <i class="fas fa-undo"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h6>No Applicants Yet</h6>
+                        <p class="text-muted">Students haven't applied for this job yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Manage Companies - Admin{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-avatar" style="background:#dc3545;"><i class="fas fa-user-shield text-white"></i></div>
+            <div class="sidebar-user-info">
+                <div class="fw-bold text-white">Administrator</div>
+                <small class="text-muted">KFUEIT Job Fair</small>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link">
+                <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('admin_students') }}" class="sidebar-link">
+                <i class="fas fa-user-graduate"></i><span>Students</span>
+            </a>
+            <a href="{{ url_for('admin_companies') }}" class="sidebar-link active">
+                <i class="fas fa-building"></i><span>Companies</span>
+            </a>
+            <a href="{{ url_for('admin_jobs') }}" class="sidebar-link">
+                <i class="fas fa-briefcase"></i><span>Jobs</span>
+            </a>
+            <hr style="border-color:#334155; margin: 1rem 0;">
+            <a href="{{ url_for('admin_logout') }}" class="sidebar-link text-danger">
+                <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+            </a>
+        </nav>
+    </aside>
+    <main class="dashboard-main">
+        <div class="dashboard-topbar">
+            <h4 class="mb-0 fw-bold"><i class="fas fa-building me-2"></i>Manage Companies</h4>
+            <div class="ms-auto d-flex gap-2">
+                <span class="badge bg-primary fs-6">{{ companies|length }} Total</span>
+                <span class="badge bg-warning text-dark fs-6">{{ companies|selectattr('approved', 'eq', False)|list|length }} Pending</span>
+            </div>
+        </div>
+        <div class="dashboard-content">
+            <div class="content-card">
+                <div class="content-card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">All Registered Companies</h6>
+                        <input type="text" id="compSearch" class="form-control form-control-sm w-auto" placeholder="Search companies..." onkeyup="filterTable('compSearch', 'compTable')">
+                    </div>
+                </div>
+                <div class="content-card-body p-0">
+                    {% if companies %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="compTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Company</th>
+                                    <th>HR Contact</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Website</th>
+                                    <th>Jobs</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for company in companies %}
+                                <tr class="{% if not company.approved %}table-warning{% endif %}">
+                                    <td>{{ loop.index }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if company.logo %}
+                                            <img src="{{ url_for('company_logo', filename=company.logo) }}" style="width:32px;height:32px;object-fit:cover;border-radius:50%;margin-right:8px;" alt="">
+                                            {% else %}
+                                            <div class="sidebar-avatar sm me-2" style="background:#0d6efd;width:32px;height:32px;font-size:0.75rem;">{{ company.company_name[0] }}</div>
+                                            {% endif %}
+                                            <span class="fw-semibold">{{ company.company_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ company.hr_name }}</td>
+                                    <td><small>{{ company.email }}</small></td>
+                                    <td><small>{{ company.phone or 'N/A' }}</small></td>
+                                    <td>
+                                        {% if company.website %}
+                                        <a href="{{ company.website }}" target="_blank" class="text-primary small">
+                                            <i class="fas fa-external-link-alt me-1"></i>Visit
+                                        </a>
+                                        {% else %}<span class="text-muted small">N/A</span>{% endif %}
+                                    </td>
+                                    <td><span class="badge bg-info">{{ company.jobs|length }}</span></td>
+                                    <td>
+                                        <span class="badge {% if company.approved %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                            {% if company.approved %}Approved{% else %}Pending{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            {% if not company.approved %}
+                                            <a href="{{ url_for('approve_company', company_id=company.id) }}" class="btn btn-sm btn-success" title="Approve" onclick="return confirm('Approve {{ company.company_name }}?')">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                            {% endif %}
+                                            <a href="{{ url_for('delete_company', company_id=company.id) }}" class="btn btn-sm btn-danger"
+                                               onclick="return confirm('Delete {{ company.company_name }} and all its jobs/applications?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-building"></i>
+                        <h6>No Companies Registered</h6>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% block extra_js %}
+<script>
+function filterTable(inputId, tableId) {
+    const input = document.getElementById(inputId).value.toLowerCase();
+    const rows = document.getElementById(tableId).getElementsByTagName('tr');
+    for (let i = 1; i < rows.length; i++) {
+        rows[i].style.display = rows[i].textContent.toLowerCase().includes(input) ? '' : 'none';
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}

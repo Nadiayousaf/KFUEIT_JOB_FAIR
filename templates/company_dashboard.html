@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Company Dashboard - KFUEIT Job Fair{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-avatar" style="background:#0d6efd;">
+                {% if company.logo %}
+                <img src="{{ url_for('company_logo', filename=company.logo) }}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                {% else %}
+                {{ company.company_name[0] }}
+                {% endif %}
+            </div>
+            <div class="sidebar-user-info">
+                <div class="fw-bold text-white small">{{ company.company_name }}</div>
+                <small class="text-muted">{{ company.hr_name }}</small>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('company_dashboard') }}" class="sidebar-link active">
+                <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('post_job') }}" class="sidebar-link">
+                <i class="fas fa-plus-circle"></i><span>Post New Job</span>
+            </a>
+            <hr style="border-color:#334155; margin: 1rem 0;">
+            <a href="{{ url_for('logout') }}" class="sidebar-link text-danger">
+                <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+            </a>
+        </nav>
+    </aside>
+    <main class="dashboard-main">
+        <div class="dashboard-topbar">
+            <h4 class="mb-0 fw-bold">Company Dashboard</h4>
+            <div class="ms-auto">
+                <a href="{{ url_for('post_job') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus me-1"></i>Post New Job
+                </a>
+            </div>
+        </div>
+        <div class="dashboard-content">
+            <!-- Stats -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="stat-card stat-blue">
+                        <i class="fas fa-briefcase stat-icon"></i>
+                        <div class="stat-value">{{ jobs|length }}</div>
+                        <div class="stat-label">Jobs Posted</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card stat-green">
+                        <i class="fas fa-users stat-icon"></i>
+                        <div class="stat-value">{{ total_applicants }}</div>
+                        <div class="stat-label">Total Applicants</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card stat-yellow">
+                        <i class="fas fa-check-double stat-icon"></i>
+                        <div class="stat-value">
+                            {% set shortlisted = namespace(count=0) %}
+                            {% for job in jobs %}
+                                {% for app in job.applications %}
+                                    {% if app.status == 'Shortlisted' %}{% set shortlisted.count = shortlisted.count + 1 %}{% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                            {{ shortlisted.count }}
+                        </div>
+                        <div class="stat-label">Shortlisted</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jobs List -->
+            <div class="content-card">
+                <div class="content-card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="fas fa-list-alt me-2"></i>My Job Postings</h6>
+                    <a href="{{ url_for('post_job') }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add Job
+                    </a>
+                </div>
+                <div class="content-card-body p-0">
+                    {% if jobs %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Location</th>
+                                    <th>Salary</th>
+                                    <th>Deadline</th>
+                                    <th>Applicants</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in jobs %}
+                                <tr>
+                                    <td class="fw-semibold">{{ job.title }}</td>
+                                    <td><i class="fas fa-map-marker-alt text-muted me-1"></i>{{ job.location or 'N/A' }}</td>
+                                    <td><small class="text-success">{{ job.salary or 'N/A' }}</small></td>
+                                    <td><small class="text-muted">{{ job.deadline or 'Open' }}</small></td>
+                                    <td>
+                                        <a href="{{ url_for('view_applicants', job_id=job.id) }}" class="badge bg-primary text-decoration-none">
+                                            {{ job.applications|length }} applicant{{ 's' if job.applications|length != 1 }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('view_applicants', job_id=job.id) }}" class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('delete_job', job_id=job.id) }}" class="btn btn-sm btn-outline-danger"
+                                           onclick="return confirm('Delete this job and all its applications?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-briefcase"></i>
+                        <h6>No Jobs Posted Yet</h6>
+                        <p class="text-muted">Start attracting top talent by posting your first job.</p>
+                        <a href="{{ url_for('post_job') }}" class="btn btn-primary">Post First Job</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

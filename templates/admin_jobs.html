@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Manage Jobs - Admin{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar kf-admin-sidebar" id="sidebar">
+        <div class="sidebar-header" style="background: linear-gradient(135deg,#1a0a0a,#3d0000);">
+            <div class="text-center">
+                <svg viewBox="0 0 80 80" width="55" height="55" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="80" height="80" rx="14" fill="#8b0000"/>
+                    <rect x="5" y="5" width="70" height="70" rx="10" fill="none" stroke="#FFD700" stroke-width="2"/>
+                    <text x="40" y="28" text-anchor="middle" font-size="12" font-weight="900" fill="#FFD700" font-family="Arial,sans-serif">KFUEIT</text>
+                    <rect x="10" y="32" width="60" height="1.5" rx="1" fill="#FFD700" opacity="0.5"/>
+                    <text x="40" y="48" text-anchor="middle" font-size="9" font-weight="700" fill="#ffffff" font-family="Arial,sans-serif">ADMIN</text>
+                </svg>
+                <div class="fw-bold text-white mt-1">Administrator</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+            <a href="{{ url_for('admin_students') }}" class="sidebar-link"><i class="fas fa-user-graduate"></i><span>Students</span></a>
+            <a href="{{ url_for('admin_companies') }}" class="sidebar-link"><i class="fas fa-building"></i><span>Companies</span></a>
+            <a href="{{ url_for('admin_jobs') }}" class="sidebar-link active"><i class="fas fa-briefcase"></i><span>Jobs</span></a>
+            <hr style="border-color:#334155;">
+            <a href="{{ url_for('admin_logout') }}" class="sidebar-link text-danger"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="dashboard-topbar" style="background:linear-gradient(90deg,#1a0a0a,#2d0505);">
+            <button class="btn btn-sm btn-outline-light d-lg-none me-2" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+            <h4 class="mb-0 fw-bold text-white"><i class="fas fa-briefcase me-2"></i>Manage Jobs</h4>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="content-card">
+                <div class="content-card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">All Job Listings ({{ jobs|length }})</h6>
+                    <input type="text" class="form-control form-control-sm w-auto" placeholder="Search jobs..." oninput="filterTable(this,'jobsTable')">
+                </div>
+                <div class="content-card-body p-0">
+                    {% if jobs %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="jobsTable">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Job Title</th>
+                                    <th>Company</th>
+                                    <th>Location</th>
+                                    <th>Salary</th>
+                                    <th>Applicants</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in jobs %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td class="fw-semibold">{{ job.title }}</td>
+                                    <td>{{ job.company.company_name }}</td>
+                                    <td><small class="text-muted">{{ job.location or '—' }}</small></td>
+                                    <td><small class="text-success">{{ job.salary or '—' }}</small></td>
+                                    <td><span class="badge bg-primary">{{ job.applications|length }}</span></td>
+                                    <td>
+                                        <a href="{{ url_for('admin_delete_job', job_id=job.id) }}" class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Delete job: {{ job.title }}?')">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state"><i class="fas fa-briefcase fa-3x text-muted mb-3 d-block"></i><p class="text-muted">No jobs posted yet.</p></div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% block extra_js %}
+<script>
+document.getElementById('sidebarToggle')?.addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('active'));
+function filterTable(input, tableId) {
+    const filter = input.value.toLowerCase();
+    document.querySelectorAll('#'+tableId+' tbody tr').forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(filter) ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}
+{% endblock %}

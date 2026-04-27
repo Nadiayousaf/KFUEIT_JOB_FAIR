@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+{% block title %}KFUEIT Job Fair 2026 - Find Your Dream Career{% endblock %}
+{% block content %}
+
+<!-- ===== HERO SECTION ===== -->
+<section class="kf-hero">
+    <div class="kf-hero-bg"></div>
+    <div class="container position-relative">
+        <div class="row align-items-center" style="min-height: 92vh;">
+            <div class="col-lg-7">
+                <!-- Logo Badge -->
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <svg viewBox="0 0 80 80" width="70" height="70" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="gHero" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FFD700"/>
+                                <stop offset="100%" style="stop-color:#FFA500"/>
+                            </linearGradient>
+                        </defs>
+                        <rect width="80" height="80" rx="16" fill="url(#gHero)"/>
+                        <text x="40" y="30" text-anchor="middle" font-size="14" font-weight="900" fill="#0a2342" font-family="Arial,sans-serif">KFUEIT</text>
+                        <rect x="10" y="35" width="60" height="2" rx="1" fill="#0a2342" opacity="0.4"/>
+                        <text x="40" y="52" text-anchor="middle" font-size="11" font-weight="700" fill="#0a2342" font-family="Arial,sans-serif">JOB FAIR</text>
+                        <text x="40" y="68" text-anchor="middle" font-size="9" font-weight="400" fill="#1a3a6a" font-family="Arial,sans-serif">2026</text>
+                    </svg>
+                    <div>
+                        <div class="text-warning fw-bold" style="font-size:1.1rem;">KFUEIT Job Fair 2026</div>
+                        <div class="text-light small">Khwaja Fareed University of Engineering &amp; IT</div>
+                    </div>
+                </div>
+
+                <h1 class="kf-hero-title">
+                    Launch Your <span class="text-warning">Career</span> with<br>
+                    Pakistan's Top Employers
+                </h1>
+                <p class="kf-hero-subtitle">
+                    Connect with leading companies, explore exciting opportunities, and take the first step toward your dream career at KFUEIT's premier job fair platform.
+                </p>
+
+                <!-- Quick Search -->
+                <div class="kf-hero-search">
+                    <form action="{{ url_for('jobs') }}" method="GET" class="d-flex gap-2 flex-wrap">
+                        <input type="text" name="search" class="form-control form-control-lg flex-grow-1"
+                               placeholder="🔍 Search jobs, skills, or companies...">
+                        <select name="location" class="form-select form-select-lg" style="max-width:200px;">
+                            <option value="">📍 All Cities</option>
+                            {% for loc in locations %}
+                            <option value="{{ loc.name }}">{{ loc.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-warning btn-lg fw-bold px-4">
+                            Search Jobs
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Popular Cities -->
+                <div class="mt-3 d-flex flex-wrap gap-2">
+                    <small class="text-light opacity-75 me-1 align-self-center">Popular:</small>
+                    {% for loc in locations[:5] %}
+                    <a href="{{ url_for('jobs', location=loc.name) }}" class="kf-city-tag">
+                        <i class="fas fa-map-marker-alt me-1"></i>{{ loc.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Stats Column -->
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="row g-3 justify-content-center">
+                    <div class="col-6">
+                        <div class="kf-hero-stat">
+                            <div class="stat-num text-warning fw-black">{{ total_jobs }}+</div>
+                            <div class="text-light small">Job Openings</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="kf-hero-stat">
+                            <div class="stat-num text-warning fw-black">{{ total_companies }}+</div>
+                            <div class="text-light small">Top Companies</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="kf-hero-stat">
+                            <div class="stat-num text-warning fw-black">{{ total_students }}+</div>
+                            <div class="text-light small">Students Registered</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="kf-hero-stat">
+                            <div class="stat-num text-warning fw-black">5+</div>
+                            <div class="text-light small">Cities Covered</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Wave -->
+    <div class="kf-hero-wave">
+        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#f1f5f9"/>
+        </svg>
+    </div>
+</section>
+
+<!-- ===== LATEST JOBS ===== -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Latest Job Openings</h2>
+                <p class="text-muted mb-0">Fresh opportunities from top employers</p>
+            </div>
+            <a href="{{ url_for('jobs') }}" class="btn btn-outline-primary">View All Jobs <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+
+        {% if jobs %}
+        <div class="row g-4">
+            {% for job in jobs %}
+            <div class="col-lg-4 col-md-6">
+                <div class="kf-job-card h-100">
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="kf-company-avatar me-3">{{ job.company.company_name[0] }}</div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0 fw-bold">{{ job.title }}</h6>
+                            <div class="text-primary small fw-semibold">{{ job.company.company_name }}</div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        {% if job.location %}<span class="kf-meta-tag"><i class="fas fa-map-marker-alt text-danger me-1"></i>{{ job.location }}</span>{% endif %}
+                        {% if job.salary %}<span class="kf-meta-tag text-success"><i class="fas fa-money-bill me-1"></i>{{ job.salary }}</span>{% endif %}
+                    </div>
+                    <p class="text-muted small mb-3">{{ job.description[:120] }}{% if job.description|length > 120 %}...{% endif %}</p>
+                    <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
+                        <small class="text-muted"><i class="fas fa-users me-1"></i>{{ job.applications|length }} applied</small>
+                        {% if session.get('user_type') == 'student' %}
+                        <a href="{{ url_for('apply_job', job_id=job.id) }}" class="btn btn-sm btn-primary"
+                           onclick="return confirm('Apply for {{ job.title }}?')">Apply Now</a>
+                        {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-sm btn-outline-primary">Login to Apply</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-briefcase fa-4x text-muted mb-3 d-block"></i>
+            <h5 class="text-muted">No jobs posted yet. Check back soon!</h5>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ===== COMPANIES ===== -->
+{% if companies %}
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-2">Participating Companies</h2>
+            <p class="text-muted">Leading organizations looking for KFUEIT talent</p>
+        </div>
+        <div class="row g-4">
+            {% for company in companies %}
+            <div class="col-md-3 col-sm-6">
+                <div class="kf-company-card text-center">
+                    <div class="kf-company-logo-big mx-auto mb-3">{{ company.company_name[0] }}</div>
+                    <div class="fw-bold">{{ company.company_name }}</div>
+                    <small class="text-muted">{{ company.jobs|length }} Job{{ 's' if company.jobs|length != 1 }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-2">How It Works</h2>
+            <p class="text-muted">3 simple steps to your next opportunity</p>
+        </div>
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="kf-step-card">
+                    <div class="kf-step-num">1</div>
+                    <i class="fas fa-user-plus fa-2x text-primary mb-3 d-block"></i>
+                    <h5 class="fw-bold">Register</h5>
+                    <p class="text-muted small">Create your student profile with your skills, CGPA, and resume.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="kf-step-card">
+                    <div class="kf-step-num">2</div>
+                    <i class="fas fa-search fa-2x text-success mb-3 d-block"></i>
+                    <h5 class="fw-bold">Browse Jobs</h5>
+                    <p class="text-muted small">Search and filter jobs by location, salary, and job type.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="kf-step-card">
+                    <div class="kf-step-num">3</div>
+                    <i class="fas fa-paper-plane fa-2x text-warning mb-3 d-block"></i>
+                    <h5 class="fw-bold">Apply & Get Hired</h5>
+                    <p class="text-muted small">Apply with one click and track your application status in real-time.</p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ url_for('student_register') }}" class="btn btn-primary btn-lg me-3 px-4">
+                <i class="fas fa-user-graduate me-2"></i>Register as Student
+            </a>
+            <a href="{{ url_for('jobs') }}" class="btn btn-outline-primary btn-lg px-4">
+                <i class="fas fa-briefcase me-2"></i>Browse All Jobs
+            </a>
+        </div>
+    </div>
+</section>
+
+{% block extra_css %}
+<style>
+.kf-hero {
+    background: linear-gradient(135deg, #0a2342 0%, #1a4a8a 60%, #0a3a6e 100%);
+    position: relative;
+    overflow: hidden;
+    padding: 5rem 0 0;
+}
+.kf-hero-bg {
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.kf-hero-title {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 1.2rem;
+}
+.kf-hero-subtitle {
+    font-size: 1.1rem;
+    color: #aaccff;
+    margin-bottom: 2rem;
+    max-width: 540px;
+}
+.kf-hero-search {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 14px;
+    padding: 1rem;
+}
+.kf-hero-stat {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+}
+.kf-hero-stat .stat-num { font-size: 2.5rem; font-weight: 900; }
+.kf-city-tag {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #cce0ff;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.kf-city-tag:hover { background: #FFD700; color: #0a2342; border-color: #FFD700; }
+.kf-hero-wave { margin-top: -2px; line-height: 0; }
+.kf-company-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #e0e7ef;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: all 0.2s;
+}
+.kf-company-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.kf-company-logo-big {
+    width: 64px; height: 64px; border-radius: 14px;
+    background: linear-gradient(135deg, #0a2342, #1a4a8a);
+    color: #FFD700; display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; font-weight: 900;
+}
+.kf-step-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 2rem;
+    border: 1px solid #e0e7ef;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    position: relative;
+}
+.kf-step-num {
+    position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #0a2342, #1a4a8a);
+    color: #FFD700; font-weight: 900; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 10px rgba(10,35,66,0.4);
+}
+@media (max-width: 768px) {
+    .kf-hero-title { font-size: 2rem; }
+    .kf-hero-search .d-flex { flex-direction: column; }
+}
+</style>
+{% endblock %}
+{% endblock %}

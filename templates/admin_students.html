@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Manage Students - Admin{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-avatar" style="background:#dc3545;"><i class="fas fa-user-shield text-white"></i></div>
+            <div class="sidebar-user-info">
+                <div class="fw-bold text-white">Administrator</div>
+                <small class="text-muted">KFUEIT Job Fair</small>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link">
+                <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('admin_students') }}" class="sidebar-link active">
+                <i class="fas fa-user-graduate"></i><span>Students</span>
+            </a>
+            <a href="{{ url_for('admin_companies') }}" class="sidebar-link">
+                <i class="fas fa-building"></i><span>Companies</span>
+            </a>
+            <a href="{{ url_for('admin_jobs') }}" class="sidebar-link">
+                <i class="fas fa-briefcase"></i><span>Jobs</span>
+            </a>
+            <hr style="border-color:#334155; margin: 1rem 0;">
+            <a href="{{ url_for('admin_logout') }}" class="sidebar-link text-danger">
+                <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+            </a>
+        </nav>
+    </aside>
+    <main class="dashboard-main">
+        <div class="dashboard-topbar">
+            <h4 class="mb-0 fw-bold"><i class="fas fa-user-graduate me-2"></i>Manage Students</h4>
+            <div class="ms-auto">
+                <span class="badge bg-primary fs-6">{{ students|length }} Students</span>
+            </div>
+        </div>
+        <div class="dashboard-content">
+            <div class="content-card">
+                <div class="content-card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">All Registered Students</h6>
+                        <input type="text" id="studentSearch" class="form-control form-control-sm w-auto" placeholder="Search students..." onkeyup="filterTable('studentSearch', 'studentsTable')">
+                    </div>
+                </div>
+                <div class="content-card-body p-0">
+                    {% if students %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="studentsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Department</th>
+                                    <th>CGPA</th>
+                                    <th>Skills</th>
+                                    <th>Resume</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td class="fw-semibold">{{ student.name }}</td>
+                                    <td><small>{{ student.email }}</small></td>
+                                    <td><small>{{ student.phone or 'N/A' }}</small></td>
+                                    <td><small>{{ student.department or 'N/A' }}</small></td>
+                                    <td>
+                                        {% if student.cgpa %}
+                                        <span class="badge {% if student.cgpa >= 3.5 %}bg-success{% elif student.cgpa >= 3.0 %}bg-primary{% else %}bg-warning text-dark{% endif %}">
+                                            {{ student.cgpa }}
+                                        </span>
+                                        {% else %}<span class="text-muted">N/A</span>{% endif %}
+                                    </td>
+                                    <td><small>{{ (student.skills or 'N/A')[:30] }}{% if student.skills and student.skills|length > 30 %}...{% endif %}</small></td>
+                                    <td>
+                                        {% if student.resume %}
+                                        <a href="{{ url_for('download_resume', filename=student.resume) }}" target="_blank" class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                        {% else %}<span class="text-muted small">None</span>{% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('delete_student', student_id=student.id) }}" class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Delete {{ student.name }}? This cannot be undone.')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-user-graduate"></i>
+                        <h6>No Students Registered</h6>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% block extra_js %}
+<script>
+function filterTable(inputId, tableId) {
+    const input = document.getElementById(inputId).value.toLowerCase();
+    const rows = document.getElementById(tableId).getElementsByTagName('tr');
+    for (let i = 1; i < rows.length; i++) {
+        rows[i].style.display = rows[i].textContent.toLowerCase().includes(input) ? '' : 'none';
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Student Registration - KFUEIT Job Fair{% endblock %}
+{% block content %}
+<section class="auth-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9">
+                <div class="auth-card">
+                    <div class="auth-card-header">
+                        <div class="auth-logo">
+                            <div class="logo-circle-lg"><span>K</span></div>
+                        </div>
+                        <h3 class="text-white mb-1">Student Registration</h3>
+                        <p class="text-light small">Join KFUEIT Job Fair — it's completely free!</p>
+                    </div>
+                    <div class="auth-card-body">
+                        <form method="POST" action="{{ url_for('student_register') }}" enctype="multipart/form-data" data-gs-type="student_registration">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user text-primary"></i></span>
+                                        <input type="text" name="name" class="form-control" placeholder="Muhammad Ali" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope text-primary"></i></span>
+                                        <input type="email" name="email" class="form-control" placeholder="student@kfueit.edu.pk" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Phone Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-phone text-primary"></i></span>
+                                        <input type="tel" name="phone" class="form-control" placeholder="03XX-XXXXXXX">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Department <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-university text-primary"></i></span>
+                                        <select name="department" class="form-select" required>
+                                            <option value="">Select Department</option>
+                                            <option>Computer Science</option>
+                                            <option>Software Engineering</option>
+                                            <option>Information Technology</option>
+                                            <option>Electrical Engineering</option>
+                                            <option>Mechanical Engineering</option>
+                                            <option>Civil Engineering</option>
+                                            <option>Chemical Engineering</option>
+                                            <option>Mathematics</option>
+                                            <option>Physics</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">CGPA</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-star text-primary"></i></span>
+                                        <input type="number" name="cgpa" class="form-control" placeholder="3.5" step="0.01" min="0" max="4">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-lock text-primary"></i></span>
+                                        <input type="password" name="password" id="regPassword" class="form-control" placeholder="Min. 6 characters" required minlength="6">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('regPassword', this)">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">Skills</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-code text-primary"></i></span>
+                                        <input type="text" name="skills" class="form-control" placeholder="Python, JavaScript, React, SQL, etc.">
+                                    </div>
+                                    <small class="text-muted">Separate skills with commas</small>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 btn-lg fw-bold mt-4">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                        </form>
+                        <hr class="my-4">
+                        <div class="text-center">
+                            <p class="text-muted mb-0">Already registered? <a href="{{ url_for('login') }}" class="text-primary fw-bold">Login here</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% block extra_js %}
+<script>
+function togglePassword(id, btn) {
+    const inp = document.getElementById(id);
+    if (inp.type === 'password') { inp.type = 'text'; btn.innerHTML = '<i class="fas fa-eye-slash"></i>'; }
+    else { inp.type = 'password'; btn.innerHTML = '<i class="fas fa-eye"></i>'; }
+}
+</script>
+{% endblock %}
+{% endblock %}
